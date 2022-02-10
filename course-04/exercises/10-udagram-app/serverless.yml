@@ -20,7 +20,7 @@ provider:
     GROUPS_TABLE: Groups-${self:provider.stage}
     IMAGES_TABLE: Images-${self:provider.stage}
     IMAGE_ID_INDEX: ImageIdIndex
-    IMAGES_S3_BUCKET: serverless-ng-images-$(self:provider.stage})
+    IMAGES_S3_BUCKET: serverless-ng-images-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
 
   iamRoleStatements:
@@ -43,7 +43,7 @@ provider:
       Action:
         - s3:PutObject
         - s3:GetObject
-      Resource: 'arn:aws::s3:${self:provider.environment.IMAGES_S3_BUCKET}/*'
+      Resource: arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*
            
 custom:
   documentation:
@@ -171,8 +171,7 @@ resources:
          BucketName: ${self:provider.environment.IMAGES_S3_BUCKET}
          CorsConfiguration:
            CorsRules:
-            -
-              AllowedOrigins:
+            - AllowedOrigins:
                - '*'
               AllowedHeaders:
               - '*'
@@ -195,8 +194,8 @@ resources:
               Effect: Allow
               Principal: '*'
               Action: 's3:GetObject'
-              Resource: 'arn:aws:s3::${self:provider.environment.IMAGES_S3_BUCKET}/*'        
-        Bucket: { Ref: AttachmentsBucket}  
+              Resource: 'arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*'        
+        Bucket: {Ref: AttachmentsBucket}  
 
 
 
