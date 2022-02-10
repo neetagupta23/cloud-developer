@@ -14,7 +14,7 @@
   "devDependencies": {
     "@types/aws-lambda": "^8.10.17",
     "@types/node": "^10.12.18",
-    "aws-sdk": "^2.1066.0",
+    "aws-sdk": "^2.1072.0",
     "serverless-aws-documentation": "^1.1.0",
     "serverless-offline": "^8.4.0",
     "serverless-reqvalidator-plugin": "^1.0.3",

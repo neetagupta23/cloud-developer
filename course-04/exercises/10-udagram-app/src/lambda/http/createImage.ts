@@ -4,10 +4,15 @@ import 'source-map-support/register'
 import * as AWS from 'aws-sdk'
 import * as uuid from 'uuid'
 
+const s3= new AWS.S3({
+  signatureVersion: 'v4'
+})
 
 const docClient =new AWS.DynamoDB.DocumentClient()
 const groupsTable= process.env.GROUPS_TABLE
 const imagesTable= process.env.IMAGES_TABLE
+const bucketName= process.env.IMAGES_S3_BUCKET
+const urlExpiration= process.env.SIGNED_URL_EXPIRATION
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   console.log('Processing event: ', event)
@@ -31,13 +36,16 @@ if(!validGroupId){
 
     const newItem= createImage(groupId,imageId,event)
 
+    const url = getUploadUrl(imageId)
+
    return {
     statusCode: 201,
     headers: {
       'Access-Control-Allow-Origin': '*'
     },
     body: JSON.stringify({
-      newItem
+      newItem,
+      uploadUrl: url
  })
   }
 }
@@ -62,7 +70,8 @@ async function createImage(groupId: string, imageId: string, event: any) {
     groupId,
     timesstamp,
     imageId,
-    ...newImage
+    ...newImage,
+    imageUrl: 'https://${bucketName}.s3.amazonaws.com/${imageId}'
   }
 
   console.log('Storing new item:', newItem)
@@ -74,5 +83,13 @@ async function createImage(groupId: string, imageId: string, event: any) {
 
  return newItem
 
+}
+
+function getUploadUrl(imageId: string) {
+ return s3.getSignedUrl('putObject',{
+   Bucket: bucketName,
+   Key: imageId,
+   Expires: Number(urlExpiration)
+ })
 }
 
