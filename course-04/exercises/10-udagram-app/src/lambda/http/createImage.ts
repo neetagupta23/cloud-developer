@@ -34,7 +34,7 @@ if(!validGroupId){
 
     const imageId = uuid.v4()
 
-    const newItem= createImage(groupId,imageId,event)
+    const newItem= await createImage(groupId,imageId,event)
 
     const url = getUploadUrl(imageId)
 
@@ -63,12 +63,12 @@ async function groupExists(groupId: string) {
 
 }
 async function createImage(groupId: string, imageId: string, event: any) {
-  const timesstamp= new Date().toISOString()
+  const timestamp= new Date().toISOString()
   const newImage= JSON.parse(event.body)
 
   const newItem={
     groupId,
-    timesstamp,
+    timestamp,
     imageId,
     ...newImage,
     imageUrl: 'https://${bucketName}.s3.amazonaws.com/${imageId}'
