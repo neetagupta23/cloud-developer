@@ -1,6 +1,7 @@
-import { S3Handler, S3Event } from "aws-lambda";
+import { S3Event,SNSHandler, SNSEvent } from "aws-lambda";
 import 'source-map-support/register'
 import * as AWS from 'aws-sdk'
+
 
 const docClient= new AWS.DynamoDB.DocumentClient()
 
@@ -15,14 +16,30 @@ const connectionParams={
 }
 
 const apiGateway=new AWS.ApiGatewayManagementApi(connectionParams)
-export const handler: S3Handler = async (event: S3Event) =>
+export const handler: SNSHandler = async (event: SNSEvent) =>
 {
     console.log('Ünnecessary printing name of stage', stage )
     console.log('Ünnecessary printing name of apiid', apiId )
 
     console.log('connectionParams',apiGateway.endpoint)
    
-    for (const record of event.Records)
+    for (const snsRecord of event.Records)
+    {
+        const s3EventStr = snsRecord.Sns.Message
+        /// <Model name~Inherit> Model type: Description
+        console.log('Processing S3 event', s3EventStr)
+        const s3Event = JSON.parse(s3EventStr)
+        
+        await processS3Event(s3Event)
+    }
+
+}
+
+async function processS3Event(s3Event: S3Event) 
+{
+   console.log('connectionParams',apiGateway.endpoint)
+   
+    for (const record of s3Event.Records)
     {
         const key = record.s3.object.key
         console.log('Processing S3 item with key', key)
@@ -39,7 +56,7 @@ export const handler: S3Handler = async (event: S3Event) =>
             const connectionId= connection.id
             await sendMessageToClient(connectionId,payload)
     
-    }
+         }
   }
 }
 

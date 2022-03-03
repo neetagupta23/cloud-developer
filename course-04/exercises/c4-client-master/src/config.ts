@@ -1,8 +1,8 @@
-const apiId = 'nhmk625tw0'
-export const apiEndpoint = `https://${apiId}.execute-api.us-east-1.amazonaws.com/dev`
+const apiId = 'a6bz92ndz6'
+export const apiEndpoint = `https://a6bz92ndz6.execute-api.us-east-1.amazonaws.com/dev`
 
 export const authConfig = {
-  domain: 'test-endpoint.auth0.com',
-  clientId: 'A72UMiQQJzmHQRPpe1dHOyq3EfPvo3Hy',
+  domain: 'dev-oyocqqx8.jp.auth0.com',
+  clientId: '3VUvbCZU5DuiWMbhPThYsBxGFVeqKsfI',
   callbackUrl: 'http://localhost:3000/callback'
 }

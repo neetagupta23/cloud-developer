@@ -1,8 +1,13 @@
-import { APIGatewayProxyHandler, APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import {  APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import 'source-map-support/register'
 
 import * as AWS from 'aws-sdk'
 import * as uuid from 'uuid'
+
+import * as middy from 'middy'
+import { cors } from 'middy/middlewares'
+
+
 
 const s3= new AWS.S3({
   signatureVersion: 'v4'
@@ -14,7 +19,7 @@ const imagesTable= process.env.IMAGES_TABLE
 const bucketName= process.env.IMAGES_S3_BUCKET
 const urlExpiration= process.env.SIGNED_URL_EXPIRATION
 
-export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+export const handler =middy( async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   console.log('Processing event: ', event)
 
   const groupId = event.pathParameters.groupId 
@@ -23,10 +28,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
 if(!validGroupId){
         return{
          statusCode: 404,
-        headers: {
-                'Access-Control-Allow-Origin': '*'
-            },
-            body: JSON.stringify({
+         body: JSON.stringify({
                 error: 'Group does not exist'
             })
         }
@@ -40,15 +42,12 @@ if(!validGroupId){
 
    return {
     statusCode: 201,
-    headers: {
-      'Access-Control-Allow-Origin': '*'
-    },
     body: JSON.stringify({
       newItem,
       uploadUrl: url
  })
   }
-}
+})
 
 async function groupExists(groupId: string) {
      const result = await docClient.get({
@@ -93,3 +92,10 @@ function getUploadUrl(imageId: string) {
  })
 }
 
+handler.use(
+  cors(
+    {
+      credentials: true
+    }
+  )
+)
